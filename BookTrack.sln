@@ -10,6 +10,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTrack.Api", "BookTrack.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTrack.Data", "BookTrack.Data\BookTrack.Data.csproj", "{F063F008-4E29-4DB3-8427-A1A3B7CD7DF0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTrack.Auth", "BookTrack.Auth\BookTrack.Auth.csproj", "{47444D44-1F94-4E01-95F9-0C9F0F19CD06}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F063F008-4E29-4DB3-8427-A1A3B7CD7DF0} = {F063F008-4E29-4DB3-8427-A1A3B7CD7DF0}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +29,10 @@ Global
 		{F063F008-4E29-4DB3-8427-A1A3B7CD7DF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F063F008-4E29-4DB3-8427-A1A3B7CD7DF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F063F008-4E29-4DB3-8427-A1A3B7CD7DF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47444D44-1F94-4E01-95F9-0C9F0F19CD06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47444D44-1F94-4E01-95F9-0C9F0F19CD06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47444D44-1F94-4E01-95F9-0C9F0F19CD06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47444D44-1F94-4E01-95F9-0C9F0F19CD06}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

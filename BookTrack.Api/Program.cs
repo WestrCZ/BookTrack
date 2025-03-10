@@ -6,7 +6,7 @@ using BookTrack.Data;
 using Microsoft.AspNetCore.Identity;
 using BookTrack.Api.Services;
 using BookTrack.Api.Interfaces;
-using OpenIddict.Validation.AspNetCore;
+using BookTrack.Api.Controllers;
 
 namespace BookTrack.Api;
 
@@ -18,15 +18,11 @@ public class Program
 
         AddServices(builder);
         ConfigureDb(builder);
-        ConfigureOpenIddict(builder);
         ConfigureSwagger(builder);
+        ConfigureAuth(builder);
 
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-            options.DefaultScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme; // Ensure no cookies!
-        });
+        builder.Services.AddControllers()
+            .AddApplicationPart(typeof(AuthController).Assembly); // Reference to Auth controllers assembly
 
         var app = builder.Build();
 
@@ -46,24 +42,24 @@ public class Program
         app.Run();
     }
 
-    private static void ConfigureSwagger(WebApplicationBuilder builder) =>
-            // Configure Swagger with JWT auth support
-            builder.Services.AddSwaggerGen(c =>
+    private static void ConfigureSwagger(WebApplicationBuilder builder)
+    {
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Book API", Version = "v1" });
+
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Book API", Version = "v1" });
+                In = ParameterLocation.Header,
+                Description = "Please enter a valid token",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "Bearer"
+            });
 
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    In = ParameterLocation.Header,
-                    Description = "Please enter a valid token",
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
-                    BearerFormat = "JWT",
-                    Scheme = "Bearer"
-                });
-
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
                 {
                     new OpenApiSecurityScheme
                     {
@@ -75,44 +71,8 @@ public class Program
                     },
                     new string[] {}
                 }
-                });
             });
-    private static void ConfigureOpenIddict(WebApplicationBuilder builder)
-    {
-        builder.Services.AddOpenIddict()
-                    .AddCore(options =>
-                    {
-                        options.UseEntityFrameworkCore()
-                               .UseDbContext<AppDbContext>();
-                    })
-                    .AddServer(options =>
-                    {
-                        options.SetAuthorizationEndpointUris("/connect/authorize")
-                               .SetTokenEndpointUris("/connect/token");
-
-                        options.AllowPasswordFlow();
-
-                        options.AcceptAnonymousClients();
-
-                        options.AddEphemeralEncryptionKey();
-                        options.AddEphemeralSigningKey();
-
-                        options.UseAspNetCore()
-                               .EnableTokenEndpointPassthrough()
-                               .EnableAuthorizationEndpointPassthrough();
-                    })
-                    .AddValidation(options =>
-                    {
-                        options.UseLocalServer();
-                        options.UseAspNetCore();
-                    });
-
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.Authority = "https://localhost:5001";
-                options.Audience = "BookTrackerAPI";
-            });
+        });
     }
 
     private static void ConfigureDb(WebApplicationBuilder builder)
@@ -132,7 +92,16 @@ public class Program
     {
         builder.Services.AddScoped<IBookService, BookService>();
         builder.Services.AddSingleton<IClock>(SystemClock.Instance);
+    }
 
-        builder.Services.AddControllers();
+    private static void ConfigureAuth(WebApplicationBuilder builder)
+    {
+        // JWT Bearer Authentication for API endpoints
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.Authority = "https://localhost:5001"; // The base URL of .Auth server
+                options.Audience = "BookTrackerAPI";
+            });
     }
 }
