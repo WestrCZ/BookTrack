@@ -103,5 +103,13 @@ public class Program
                 options.Authority = "https://localhost:5001"; // The base URL of .Auth server
                 options.Audience = "BookTrackerAPI";
             });
+
+        // Register OpenIddict services to resolve OpenIddictTokenManager
+        builder.Services.AddOpenIddict()
+            .AddCore(options =>
+            {
+                options.UseEntityFrameworkCore()
+                       .UseDbContext<AppDbContext>();
+            });
     }
 }

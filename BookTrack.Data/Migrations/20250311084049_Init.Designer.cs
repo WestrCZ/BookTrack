@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookTrack.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250309213840_Initttt")]
-    partial class Initttt
+    [Migration("20250311084049_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
